@@ -27,7 +27,7 @@ def get_climate_by_specific_year(collection, year):
         return jsonify({"error": str(e)}), 500
     
 # Climate Data grouped by year
-def get_climate_by_season(collection, start, end):
+def grouped_climate_by_season(collection, start, end):
     try:
         pipeline = [
         {
@@ -55,7 +55,7 @@ def get_climate_by_season(collection, start, end):
         return jsonify({"error": str(e)}), 500
     
 # Fire data grouped by year
-def get_fire_by_season(collection, start, end):
+def grouped_fire_by_season(collection, start, end):
     try:
         pipeline = [
         {
@@ -124,12 +124,12 @@ def get_climate_by_year(year):
 @cache.cached(timeout=300)
 @app.route("/api/v1.0/climate/<int:start>/<int:end>")
 def get_climate_by_grouped_years(start, end):
-    return get_climate_by_season(weatherStations, start, end)
+    return grouped_climate_by_season(weatherStations, start, end)
 
 @cache.cached(timeout=300)
 @app.route("/api/v1.0/climate/<int:start>/<int:end>")
 def get_fires_by_grouped_years(start, end):
-    return get_fire_by_season(firePoints, start, end)
+    return grouped_fire_by_season(firePoints, start, end)
 
 # @cache.cached(timeout=300)
 # @app.route("/api/v1.0/fires/all")
