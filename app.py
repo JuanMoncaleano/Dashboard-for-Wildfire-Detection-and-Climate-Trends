@@ -57,7 +57,6 @@ def grouped_climate_by_season(collection, start, end):
         }
         ]
         data = list(collection.aggregate(pipeline))
-        # data = list(collection.find(query, {"_id": 0}))
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -139,24 +138,24 @@ def get_climate_by_specific_month(collection, start, end):
 def get_fire_by_specific_month(collection, start, end):
     try:
         pipeline = [
-        {
-            "$match": {
-                "FIRE_YEAR": {"$gte": start, "$lte": end}
-            }
-        },
-        {
-            "$group": {
-                "_id": {"$month": "$FIRE_START_DATE"},
-                "count": {"$sum": 1},
-                "total_burn": {"$sum": "$FIRE_FINAL_SIZE"}
-            }
-        },
-        {
-            "$sort": {
-                '_id': 1
-            }
+    {
+        "$match": {
+             "FIRE_YEAR": {"$gte": start, "$lte": end}
         }
-        ]
+    },
+    {
+        "$group": {
+             "_id": { "$month": { "$dateFromString": { "dateString": { "$substr": [ "$FIRE_START_DATE", 0, 10] }, "format": "%Y/%m/%d" } } },
+            "count": {"$sum": 1},
+             "total_burn": {"$sum": "$FIRE_FINAL_SIZE"}
+         }
+     },
+    {
+        "$sort": {
+             '_id': 1
+        }
+     }
+    ]
         data = list(collection.aggregate(pipeline))
         return jsonify(data)
     except Exception as e:
