@@ -108,12 +108,12 @@ def get_fires_all(collection):
         return jsonify({"error": str(e)}), 500
     
 # Climate Data by month
-def get_climate_by_specific_month(collection):
+def get_climate_by_specific_month(collection, start, end):
     try:
         pipeline = [
         {
             "$match": {
-              "LOCAL_MONTH": {"$gte": start, "$lte": end}
+              "LOCAL_YEAR": {"$gte": start, "$lte": end}
             }
         },
         {
@@ -134,33 +134,35 @@ def get_climate_by_specific_month(collection):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-# # Fire data grouped by month
-# def get_fire_by_specific_month(collection):
-#     try:
-#         pipeline = [
-#         {
-#             "$match": {
-#                 "FIRE_YEAR": {"$gte": start, "$lte": end}
-#             }
-#         },
-#         {
-#             "$group": {
-#                 "_id": "$FIRE_YEAR",
-#                 "count": {"$sum": 1},
-#                 "total_burn": {"$sum": "$FIRE_FINAL_SIZE"}
-#             }
-#         },
-#         {
-#             "$sort": {
-#                 '_id': 1
-#             }
-#         }
-#         ]
-#         data = list(collection.aggregate(pipeline))
-#         return jsonify(data)
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
 
+# Fire data grouped by month
+def get_fire_by_specific_month(collection, start, end):
+    try:
+        pipeline = [
+        {
+            "$match": {
+                "FIRE_YEAR": {"$gte": start, "$lte": end}
+            }
+        },
+        {
+            "$group": {
+                "_id": {"$month": "$FIRE_START_DATE"},
+                "count": {"$sum": 1},
+                "total_burn": {"$sum": "$FIRE_FINAL_SIZE"}
+            }
+        },
+        {
+            "$sort": {
+                '_id': 1
+            }
+        }
+        ]
+        data = list(collection.aggregate(pipeline))
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+      
 # Define routes with caching
 @cache.cached(timeout=300)
 @app.route("/")
@@ -174,7 +176,7 @@ def welcome():
         f"/api/v1.0/fires/all<br/>"
         f"/api/v1.0/climate/all<br/>"
         f"/api/v1.0/fires/{{month}}<br/>"
-        f"/api/v1.0/climate/{{month}}<br/>"
+        f"/api/v1.0/climate/month/{{start}}/{{end}}<br/>"
     )
 
 @cache.cached(timeout=300)
@@ -207,15 +209,16 @@ def get_fires():
 def get_climate():
     return get_climate_all(weatherStations)
 
-# @cache.cached(timeout=300)
-# @app.route("/api/v1.0/fires/<int:month>")
-# def get_fires_by_month(month):
-#     return get_fire_by_specific_month(firePoints, month)
+@cache.cached(timeout=300)
+@app.route("/api/v1.0/fires/month/<int:start>/<int:end>")
+def get_fires_by_month(start, end):
+    return get_fire_by_specific_month(firePoints, start, end)
 
 @cache.cached(timeout=300)
-@app.route("/api/v1.0/climate/<int:month>")
-def get_climate_by_month(month):
-    return get_climate_by_specific_month(weatherStations, month)
+@app.route("/api/v1.0/climate/month/<int:start>/<int:end>")
+def get_climate_by_month(start, end):
+    return get_climate_by_specific_month(weatherStations, start, end)
+
 
 
 if __name__ == "__main__":
