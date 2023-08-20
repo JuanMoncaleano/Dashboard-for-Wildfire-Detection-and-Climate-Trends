@@ -134,6 +134,7 @@ def get_climate_by_specific_month(collection, start, end):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+
 # Fire data grouped by month
 def get_fire_by_specific_month(collection, start, end):
     try:
@@ -161,6 +162,7 @@ def get_fire_by_specific_month(collection, start, end):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+      
 # Define routes with caching
 @cache.cached(timeout=300)
 @app.route("/")
@@ -216,6 +218,7 @@ def get_fires_by_month(start, end):
 @app.route("/api/v1.0/climate/month/<int:start>/<int:end>")
 def get_climate_by_month(start, end):
     return get_climate_by_specific_month(weatherStations, start, end)
+
 
 
 if __name__ == "__main__":
