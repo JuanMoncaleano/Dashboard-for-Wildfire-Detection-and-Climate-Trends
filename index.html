@@ -8,10 +8,32 @@
   <title>Wildfire and Climate Data Dashboard</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""/>
 
+  <!-- Our CSS -->
+  <link rel="stylesheet" type="text/css" href="./static/css/style.css">
+
+  <!-- Leaflet JavaScript code -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""></script>
+  
+  <!-- Icons -->
+  <script src="static/js/leaflet.extra-markers.min.js"></script>
+  <!-- <link rel="stylesheet" type="text/css" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"> -->
+  <link rel="stylesheet" href="./static/css/leaflet.extra-markers.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- MomentJS -->
+  <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script> -->
+  
+  <!-- D3 library -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <!-- Our JavaScript file -->
   <script src="./static/js/visualizations.js"></script>
   <script src="./static/js/leaflet-providers.js"></script>
 </head>
@@ -23,7 +45,7 @@
     <div class="row">
       <div class="col-md-12 jumbotron text-center">
         <h1>Wildfire and Climate Data Dashboard</h1>
-        <p>Use the interactive charts below to explore the dataset</p>
+        <p>Use the interactive charts below to explore the datasets</p>
       </div>
     </div>
 
@@ -37,7 +59,13 @@
       </div>
     </div>
 
-    <!-- Not sure where to place yet. This row will have several viz that change on year -->
+    <div class="row">
+      <div class="col-md-12">
+        <div id="map-title">Map Title</div>
+      </div>
+    </div>
+
+    <!-- This row will have several viz that change on year -->
     <div class="row">
       <div class="col-md-2">
         <div class="well">
@@ -51,9 +79,9 @@
           <div id="year-info" class="panel-body"></div>
         </div>
       </div>
-      <div class="col-md-9">
-        <div id="map-title">Map Title</div>
-        <div id="yearly-map" style="height: 400px;"></div>
+      <div class="col-md-10">
+        <!-- <div id="map-title">Map Title</div> -->
+        <div id="yearly-map" style="height: 450px;"></div>
       </div>
     </div>
     <div class="row">
@@ -81,6 +109,7 @@
         // console.log(fireData)
         // console.log(climateData)
 
+        // This is adding the snow and total rain together, but is turned off at the moment, as not sure it's right
         let totalPrecip = []
         for (let n = 0; n < climateData.length; n++) {
           totalPrecip.push(climateData[n].precip + climateData[n].snow);
@@ -88,7 +117,8 @@
 
         let traceScatter1 = [{ 
           x: fireData.map(item => item.count),
-          y: totalPrecip,
+          y: climateData.map(item => item.precip),
+          // y: totalPrecip,  Turned off until confirm is correct
           mode: 'markers', 
           type: 'scatter',
           text: climateData.map(item => item._id)
@@ -122,21 +152,21 @@
 
 
 
-  <!-- I could add more stuff here, I'm not sure yet, would like to discuss with you guys -->
-  <script>
-    
-    var map = L.map('animated-map').setView([50, -85], 5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-    }).addTo(map);
 
+  <script>
+    // <!-- I could add more stuff here, I'm not sure yet, would like to discuss with you guys -->
+    // var map = L.map('animated-map').setView([50, -85], 5);
+    // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    //   maxZoom: 19,
+    // }).addTo(map);
+
+    // This is the yearly map initialization that updates with the dropdown
     var yearlyMap = L.map('yearly-map').setView([50, -85], 5);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19,
     }).addTo(yearlyMap);
 
-    // Could add more scripts down here for the map itself // 
   </script>
 </body>
 
