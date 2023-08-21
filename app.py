@@ -29,7 +29,8 @@ def get_climate_by_specific_year(collection, year):
 def get_fire_by_specific_year(collection, year):
     try:
         query = {"FIRE_YEAR": year}
-        data = list(collection.find(query, {"_id": 0}))
+        sort_order = [("FIRE_START_DATE")]
+        data = list(collection.find(query, {"_id": 0}).sort(sort_order))
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
