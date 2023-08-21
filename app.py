@@ -16,16 +16,39 @@ db = client["wildfires"]
 firePoints = db["Fire_Point"]
 weatherStations = db["Clean_Climate_Data"]
 
-# Climate Data by year
+# Climate Data by year (groups by the weather station and returns aggregate data)
 def get_climate_by_specific_year(collection, year):
     try:
-        query = {"LOCAL_YEAR": year}
-        data = list(collection.find(query, {"_id": 0}))
+        # query = {"LOCAL_YEAR": year}
+        # data = list(collection.find(query, {"_id": 0}))
+        pipeline = [
+        {
+            "$match": {
+              "LOCAL_YEAR": year
+            }
+        },
+        {
+            "$group": {
+                "_id": "$STATION_NAME",
+                "lat": {"$first": "$LATITUDE"},
+                "lon": {"$first": "$LONGITUDE"},
+                "precip": {"$sum": '$TOTAL_PRECIPITATION'},
+                "snow": {"$sum": '$TOTAL_SNOWFALL'},
+                "mean_temp": {"$avg": "$MEAN_TEMPERATURE"}
+            }
+        },
+        {
+            "$sort": {
+                '_id': 1
+            }
+        }
+        ]
+        data = list(collection.aggregate(pipeline))
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-# Fire data grouped by year
+# Fire data points by year
 def get_fire_by_specific_year(collection, year):
     try:
         query = {"FIRE_YEAR": year}
@@ -35,7 +58,7 @@ def get_fire_by_specific_year(collection, year):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-# Climate Data grouped by year
+# Climate Data grouped by year (groups on the year and returns aggregate data for all weather stations)
 def grouped_climate_by_season(collection, start, end):
     try:
         pipeline = [
@@ -63,7 +86,7 @@ def grouped_climate_by_season(collection, start, end):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-# Fire data grouped by year
+# Fire data grouped by year (groups by the year and returns count and burn size)
 def grouped_fire_by_season(collection, start, end):
     try:
         pipeline = [
@@ -90,7 +113,7 @@ def grouped_fire_by_season(collection, start, end):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-# Climate Data all
+# Climate Data all (currently not used)
 def get_climate_all(collection):
     try:
         query = {"LOCAL_YEAR": {"$gte": 0}}
@@ -99,7 +122,7 @@ def get_climate_all(collection):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-# Fire data all
+# Fire data all (currently not used)
 def get_fires_all(collection):
     try:
         query = {"FIRE_YEAR": {"$gte": 0}}
@@ -108,7 +131,7 @@ def get_fires_all(collection):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-# Climate Data by month
+# Climate Data by month (currently not used)
 def get_climate_by_specific_month(collection, start, end):
     try:
         pipeline = [
@@ -137,7 +160,7 @@ def get_climate_by_specific_month(collection, start, end):
         return jsonify({"error": str(e)}), 500
     
 
-# Fire data grouped by month
+# Fire data grouped by month (currently not used)
 def get_fire_by_specific_month(collection, start, end):
     try:
         pipeline = [
