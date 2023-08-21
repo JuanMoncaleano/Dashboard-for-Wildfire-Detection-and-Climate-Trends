@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Wildfire and Climate Data Dashboard</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+  <script src="./static/js/visualizations.js"></script>
+  <script src="./static/js/leaflet-providers.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 jumbotron text-center">
+        <h1>Wildfire and Climate Data Dashboard</h1>
+        <p>Use the interactive charts below to explore the dataset</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-2">
+        <div class="well">
+          <h5>Location:</h5>
+          <select id="selLocation" onchange="updateDashboard(this.value)"></select>
+        </div>
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">Climate Info</h3>
+          </div>
+          <div id="sample-climate" class="panel-body"></div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div id="scatter"></div>
+      </div>
+      <div class="col-md-5">
+        <div id="scatter2"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div id="bubble"></div>
+      </div>
+    </div>
+    <!-- Animated Map Section based on the Leaflet-provider.js file -->
+    <div class="row">
+      <div class="col-md-12">
+        <div id="animated-map" style="height: 400px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <!-- I could add more stuff here, I'm not sure yet, would like to discuss with you guys -->
+  <script>
+    
+    var map = L.map('animated-map').setView([51.505, -0.09], 13);
+
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+    }).addTo(map);
+
+    // Could add more scripts down here for the map itself // 
+  </script>
+</body>
+
+</html>
