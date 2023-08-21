@@ -48,14 +48,12 @@
           <div class="panel-heading">
             <h3 class="panel-title">Climate Info</h3>
           </div>
-          <div id="sample-climate" class="panel-body"></div>
+          <div id="year-info" class="panel-body"></div>
         </div>
       </div>
-      <div class="col-md-5">
-        <div id="plot1"></div>
-      </div>
-      <div class="col-md-5">
-        <div id="plot2"></div>
+      <div class="col-md-9">
+        <div id="map-title">Map Title</div>
+        <div id="yearly-map" style="height: 400px;"></div>
       </div>
     </div>
     <div class="row">
@@ -75,13 +73,13 @@
 
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-  <!-- This is the scatter plot constant at the top -->
+  <!-- This is the two scatter plots that are constant at the top -->
   <script>
     d3.json('http://127.0.0.1:5000/api/v1.0/fires/1977/2022').then(function(fireData) {
       d3.json('http://127.0.0.1:5000/api/v1.0/climate/1977/2022').then(function(climateData) {
 
-        console.log(fireData)
-        console.log(climateData)
+        // console.log(fireData)
+        // console.log(climateData)
 
         let totalPrecip = []
         for (let n = 0; n < climateData.length; n++) {
@@ -90,7 +88,6 @@
 
         let traceScatter1 = [{ 
           x: fireData.map(item => item.count),
-          // y: climateData.map(item => item.precip) + climateData.map(item => item.snow),
           y: totalPrecip,
           mode: 'markers', 
           type: 'scatter',
@@ -105,7 +102,6 @@
 
         let traceScatter2 = [{ 
           x: fireData.map(item => item.count),
-          // y: climateData.map(item => item.precip) + climateData.map(item => item.snow),
           y: climateData.map(item => item.mean_temp),
           mode: 'markers', 
           type: 'scatter',
@@ -117,7 +113,6 @@
           xaxis:{title: 'Number of Fires'},
           yaxis:{title: 'Mean Temperature'}
         }
-
 
         Plotly.newPlot('scatter', traceScatter1, letlayoutScatter1);
         Plotly.newPlot('scatter2', traceScatter2, letlayoutScatter2);
@@ -131,11 +126,15 @@
   <script>
     
     var map = L.map('animated-map').setView([50, -85], 5);
-
-    
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
     }).addTo(map);
+
+    var yearlyMap = L.map('yearly-map').setView([50, -85], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(yearlyMap);
 
     // Could add more scripts down here for the map itself // 
   </script>
