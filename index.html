@@ -11,23 +11,38 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
+  <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="./static/js/visualizations.js"></script>
   <script src="./static/js/leaflet-providers.js"></script>
 </head>
 
 <body>
   <div class="container">
+
+    <!-- First row. This is the header and title -->
     <div class="row">
       <div class="col-md-12 jumbotron text-center">
         <h1>Wildfire and Climate Data Dashboard</h1>
         <p>Use the interactive charts below to explore the dataset</p>
       </div>
     </div>
+
+    <!-- Second row. This will be the scatter plots that is constant -->
+    <div class="row">
+      <div class="col-md-6">
+        <div id="scatter" style="height: 450px;"></div>
+      </div>
+      <div class="col-md-6">
+        <div id="scatter2" style="height: 450px;"></div>
+      </div>
+    </div>
+
+    <!-- Not sure where to place yet. This row will have several viz that change on year -->
     <div class="row">
       <div class="col-md-2">
         <div class="well">
-          <h5>Location:</h5>
-          <select id="selLocation" onchange="updateDashboard(this.value)"></select>
+          <h5>Year:</h5>
+          <select id="selYear" onchange="updateDashboard(this.value)"></select>
         </div>
         <div class="panel panel-primary">
           <div class="panel-heading">
@@ -37,31 +52,85 @@
         </div>
       </div>
       <div class="col-md-5">
-        <div id="scatter"></div>
+        <div id="plot1"></div>
       </div>
       <div class="col-md-5">
-        <div id="scatter2"></div>
+        <div id="plot2"></div>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
-        <div id="bubble"></div>
+        <div id="plot3"></div>
       </div>
     </div>
+
+
     <!-- Animated Map Section based on the Leaflet-provider.js file -->
     <div class="row">
-      <div class="col-md-12">
-        <div id="animated-map" style="height: 400px;"></div>
+      <div class="col-md-8">
+        <div id="animated-map" style="height: 600px;"></div>
       </div>
     </div>
   </div>
 
-  <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+  <!-- This is the scatter plot constant at the top -->
+  <script>
+    d3.json('http://127.0.0.1:5000/api/v1.0/fires/1977/2022').then(function(fireData) {
+      d3.json('http://127.0.0.1:5000/api/v1.0/climate/1977/2022').then(function(climateData) {
+
+        console.log(fireData)
+        console.log(climateData)
+
+        let totalPrecip = []
+        for (let n = 0; n < climateData.length; n++) {
+          totalPrecip.push(climateData[n].precip + climateData[n].snow);
+        };
+
+        let traceScatter1 = [{ 
+          x: fireData.map(item => item.count),
+          // y: climateData.map(item => item.precip) + climateData.map(item => item.snow),
+          y: totalPrecip,
+          mode: 'markers', 
+          type: 'scatter',
+          text: climateData.map(item => item._id)
+        }];
+
+        letlayoutScatter1 = {
+          title: 'Precipitation vs. Fires',
+          xaxis:{title: 'Number of Fires'},
+          yaxis:{title: 'Total annual Precipitation'}
+        }
+
+        let traceScatter2 = [{ 
+          x: fireData.map(item => item.count),
+          // y: climateData.map(item => item.precip) + climateData.map(item => item.snow),
+          y: climateData.map(item => item.mean_temp),
+          mode: 'markers', 
+          type: 'scatter',
+          text: climateData.map(item => item._id)
+        }];
+
+        letlayoutScatter2 = {
+          title: 'Temperature vs. Fires',
+          xaxis:{title: 'Number of Fires'},
+          yaxis:{title: 'Mean Temperature'}
+        }
+
+
+        Plotly.newPlot('scatter', traceScatter1, letlayoutScatter1);
+        Plotly.newPlot('scatter2', traceScatter2, letlayoutScatter2);
+      });
+    });
+  </script>
+
+
+
   <!-- I could add more stuff here, I'm not sure yet, would like to discuss with you guys -->
   <script>
     
-    var map = L.map('animated-map').setView([51.505, -0.09], 13);
+    var map = L.map('animated-map').setView([50, -85], 5);
 
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
