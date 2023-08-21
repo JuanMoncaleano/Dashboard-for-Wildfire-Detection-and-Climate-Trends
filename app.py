@@ -47,6 +47,7 @@ def grouped_climate_by_season(collection, start, end):
             "$group": {
                 "_id": "$LOCAL_YEAR",
                 "precip": {"$sum": '$TOTAL_PRECIPITATION'},
+                "snow": {"$sum": '$TOTAL_SNOWFALL'},
                 "mean_temp": {"$avg": "$MEAN_TEMPERATURE"}
             }
         },
@@ -119,6 +120,7 @@ def get_climate_by_specific_month(collection, start, end):
             "$group": {
                 "_id": "$LOCAL_MONTH",
                 "precip": {"$sum": '$TOTAL_PRECIPITATION'},
+                "snow": {"$sum": '$TOTAL_SNOWFALL'},
                 "mean_temp": {"$avg": "$MEAN_TEMPERATURE"}
             }
         },
