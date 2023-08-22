@@ -39,7 +39,7 @@ d3.json('http://127.0.0.1:5000/api/v1.0/fires/season/1977/2022').then(function(f
             y: 0.84
         },
         xaxis:{title: 'Number of Fires'},
-        yaxis:{title: 'Total Fire Season Precipitation'},
+        yaxis:{title: 'Total Fire Season Precipitation (mm)'},
         plot_bgcolor: '#f5f5f5', 
         paper_bgcolor: '#ffffff',
         font: {
@@ -72,7 +72,12 @@ d3.json('http://127.0.0.1:5000/api/v1.0/fires/season/1977/2022').then(function(f
         xaxis:{title: 'Number of Fires'},
         yaxis:{title: 'Mean Temperature (°C)'},
         plot_bgcolor: '#f5f5f5', 
-        paper_bgcolor: '#ffffff'
+        paper_bgcolor: '#ffffff',
+        font: {
+          family: 'Arial, sans-serif',
+          size: 14,
+          color: 'dark gray'
+      }
       }
 
       let traceRainVersusFireSize = [{ 
@@ -97,9 +102,14 @@ d3.json('http://127.0.0.1:5000/api/v1.0/fires/season/1977/2022').then(function(f
             y: 0.84
         },
         xaxis:{title: 'Size of Fires (ha)'},
-        yaxis:{title: 'Total annual Precipitation'},
+        yaxis:{title: 'Total Fire Season Precipitation (mm)'},
         plot_bgcolor: '#f5f5f5', 
-        paper_bgcolor: '#ffffff'
+        paper_bgcolor: '#ffffff',
+        font: {
+          family: 'Arial, sans-serif',
+          size: 14,
+          color: 'dark gray'
+      }
       }
 
       let traceTempVersusFireSize = [{ 
@@ -125,7 +135,12 @@ d3.json('http://127.0.0.1:5000/api/v1.0/fires/season/1977/2022').then(function(f
         xaxis:{title: 'Size of Fires (ha)'},
         yaxis:{title: 'Mean Temperature (°C)'},
         plot_bgcolor: '#f5f5f5', 
-        paper_bgcolor: '#ffffff'
+        paper_bgcolor: '#ffffff',
+        font: {
+          family: 'Arial, sans-serif',
+          size: 14,
+          color: 'dark gray'
+      }
       }
 
       Plotly.newPlot('rain-vs-count', traceRainVersusFireCount, layoutRainVersusFireCount);
