@@ -17,6 +17,7 @@ firePoints = db["Fire_Point"]
 weatherStations = db["Clean_Climate_Data"]
 
 # Climate Data by year (groups by the weather station and returns aggregate data)
+# f"/api/v1.0/climate/{{year}}<br/>"
 def get_climate_by_specific_year(collection, year):
     try:
         # query = {"LOCAL_YEAR": year}
@@ -49,6 +50,7 @@ def get_climate_by_specific_year(collection, year):
         return jsonify({"error": str(e)}), 500
     
 # Fire data points by year
+# f"/api/v1.0/fires/{{year}}<br/>"
 def get_fire_by_specific_year(collection, year):
     try:
         query = {"FIRE_YEAR": year}
@@ -59,7 +61,7 @@ def get_fire_by_specific_year(collection, year):
         return jsonify({"error": str(e)}), 500
     
 # Climate Data grouped by year (groups on the year and returns aggregate data for all weather stations)
-def grouped_climate_by_season(collection, start, end):
+def grouped_climate_by_year(collection, start, end):
     try:
         pipeline = [
         {
@@ -86,13 +88,93 @@ def grouped_climate_by_season(collection, start, end):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+# Climate Data grouped by only fire seasons (groups on the season and returns aggregate data for all weather stations)
+def grouped_climate_by_season(collection, start, end):
+    try:
+        pipeline = [
+        {
+            "$match": {
+              "LOCAL_YEAR": {"$gte": start, "$lte": end},
+              "LOCAL_MONTH": {"$gte": 5, "$lte": 9}
+            }
+        },
+        {
+            "$group": {
+                "_id": "$LOCAL_YEAR",
+                "precip": {"$sum": '$TOTAL_PRECIPITATION'},
+                # "snow": {"$sum": '$TOTAL_SNOWFALL'},
+                "mean_temp": {"$avg": "$MEAN_TEMPERATURE"}
+            }
+        },
+        {
+            "$sort": {
+                '_id': 1
+            }
+        }
+        ]
+        data = list(collection.aggregate(pipeline))
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    
 # Fire data grouped by year (groups by the year and returns count and burn size)
-def grouped_fire_by_season(collection, start, end):
+# f"/api/v1.0/fires/{{start}}/{{end}}<br/>"
+def grouped_fire_by_year(collection, start, end):
     try:
         pipeline = [
         {
             "$match": {
                 "FIRE_YEAR": {"$gte": start, "$lte": end}
+            }
+        },
+        {
+            "$group": {
+                "_id": "$FIRE_YEAR",
+                "count": {"$sum": 1},
+                "total_burn": {"$sum": "$FIRE_FINAL_SIZE"}
+            }
+        },
+        {
+            "$sort": {
+                '_id': 1
+            }
+        }
+        ]
+        data = list(collection.aggregate(pipeline))
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+# Fire data grouped by only the fire season (groups by the year and returns count and burn size)
+# f"/api/v1.0/fires/season/{{start}}/{{end}}<br/>"
+# https://www.mongodb.com/docs/v2.2/reference/operator/aggregation/project/
+def grouped_fire_by_season(collection, start, end):
+    try:
+        pipeline = [
+        {
+            "$project": {
+                "FIRE_YEAR": 1,
+                "parsed_date": {
+                    "$dateFromString": {
+                        "dateString": { "$substr": ["$FIRE_START_DATE", 0, 10] },
+                        "format": "%Y/%m/%d"
+                    }
+                },
+                "FIRE_FINAL_SIZE": 1
+            }
+        },
+        {
+            "$project": {
+                "FIRE_YEAR": 1,
+                "parsed_month": { "$month": "$parsed_date" },
+                "FIRE_FINAL_SIZE": 1
+            }
+        },        
+        {
+            "$match": {
+                "FIRE_YEAR": {"$gte": start, "$lte": end},
+                "parsed_month": {"$gte": 5, "$lte": 9}
             }
         },
         {
@@ -172,9 +254,9 @@ def get_fire_by_specific_month(collection, start, end):
     },
     {
         "$group": {
-             "_id": { "$month": { "$dateFromString": { "dateString": { "$substr": [ "$FIRE_START_DATE", 0, 10] }, "format": "%Y/%m/%d" } } },
+            "_id": { "$month": { "$dateFromString": { "dateString": { "$substr": [ "$FIRE_START_DATE", 0, 10] }, "format": "%Y/%m/%d" } } },
             "count": {"$sum": 1},
-             "total_burn": {"$sum": "$FIRE_FINAL_SIZE"}
+            "total_burn": {"$sum": "$FIRE_FINAL_SIZE"}
          }
      },
     {
@@ -203,6 +285,8 @@ def welcome():
         f"/api/v1.0/climate/all<br/>"
         f"/api/v1.0/fires/{{month}}<br/>"
         f"/api/v1.0/climate/month/{{start}}/{{end}}<br/>"
+        f"/api/v1.0/fires/season/{{start}}/{{end}}<br/>"
+        f"/api/v1.0/climate/season/{{start}}/{{end}}<br/>"
     )
 
 @cache.cached(timeout=300)
@@ -218,12 +302,12 @@ def get_climate_by_year(year):
 @cache.cached(timeout=300)
 @app.route("/api/v1.0/fires/<int:start>/<int:end>")
 def get_fires_by_grouped_years(start, end):
-    return grouped_fire_by_season(firePoints, start, end)
+    return grouped_fire_by_year(firePoints, start, end)
 
 @cache.cached(timeout=300)
 @app.route("/api/v1.0/climate/<int:start>/<int:end>")
 def get_climate_by_grouped_years(start, end):
-    return grouped_climate_by_season(weatherStations, start, end)
+    return grouped_climate_by_year(weatherStations, start, end)
 
 @cache.cached(timeout=300)
 @app.route("/api/v1.0/fires/all")
@@ -244,6 +328,16 @@ def get_fires_by_month(start, end):
 @app.route("/api/v1.0/climate/month/<int:start>/<int:end>")
 def get_climate_by_month(start, end):
     return get_climate_by_specific_month(weatherStations, start, end)
+
+@cache.cached(timeout=300)
+@app.route("/api/v1.0/fires/season/<int:start>/<int:end>")
+def get_fires_by_grouped_seasons(start, end):
+    return grouped_fire_by_season(firePoints, start, end)
+
+@cache.cached(timeout=300)
+@app.route("/api/v1.0/climate/season/<int:start>/<int:end>")
+def get_climate_by_grouped_seasons(start, end):
+    return grouped_climate_by_season(weatherStations, start, end)
 
 @app.route('/')
 def index():

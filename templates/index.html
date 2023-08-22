@@ -29,6 +29,9 @@
 
   <!-- MomentJS -->
   <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script> -->
+
+  <!-- Other head content
+  <script src="https://unpkg.com/simple-statistics@7.8.3/dist/simple-statistics.min.js"></script> -->
   
   <!-- MiniMap library -->
   <script src="https://cdn.jsdelivr.net/gh/maneoverland/leaflet.WorldMiniMap@1.0.0/dist/Control.WorldMiniMap.js" integrity="sha512-PFw8St3qenU1/dmwCfiYYN/bRcqY1p3+sBATR+rZ6622eyXOk/8izVtlmm/k8qW7KbRIJsku838WCV5LMs6FCg==" crossorigin=""></script>
@@ -40,6 +43,7 @@
   <!-- Our JavaScript file -->
   <script src="../static/js/visualizations.js"></script>
   <script src="../static/js/leaflet-providers.js"></script>
+  <script src="../static/js/plots.js"></script>
 </head>
 
 <body>
@@ -55,11 +59,29 @@
 
     <!-- Second row. This will be the scatter plots that is constant -->
     <div class="row">
+      <div class="col-md-12">
+        <div id="plots-title">
+          <h2>Climate variable versus wildfires</h2>
+          <h5>For wildfire season only (which is May to September, when 96% of all fires in data occurred)</h5>
+        </div>
+      </div>
+    </div>
+    <div class="row">
       <div class="col-md-6">
-        <div id="scatter" style="height: 450px;"></div>
+        <div id="rain-vs-count" style="height: 450px;"></div>
       </div>
       <div class="col-md-6">
-        <div id="scatter2" style="height: 450px;"></div>
+        <div id="temp-vs-count" style="height: 450px;"></div>
+      </div>
+    </div>
+
+    <!-- Third row. This will be the scatter plots that is constant -->
+    <div class="row">
+      <div class="col-md-6">
+        <div id="rain-vs-size" style="height: 450px;"></div>
+      </div>
+      <div class="col-md-6">
+        <div id="temp-vs-size" style="height: 450px;"></div>
       </div>
     </div>
 
@@ -104,58 +126,6 @@
   </div>
 
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-  <!-- This is the two scatter plots that are constant at the top -->
-  <script>
-    d3.json('http://127.0.0.1:5000/api/v1.0/fires/1977/2022').then(function(fireData) {
-      d3.json('http://127.0.0.1:5000/api/v1.0/climate/1977/2022').then(function(climateData) {
-
-        // console.log(fireData)
-        // console.log(climateData)
-
-        // This is adding the snow and total rain together, but is turned off at the moment, as not sure it's right
-        let totalPrecip = []
-        for (let n = 0; n < climateData.length; n++) {
-          totalPrecip.push(climateData[n].precip + climateData[n].snow);
-        };
-
-        let traceScatter1 = [{ 
-          x: fireData.map(item => item.count),
-          y: climateData.map(item => item.precip),
-          // y: totalPrecip,  Turned off until confirm is correct
-          mode: 'markers', 
-          type: 'scatter',
-          text: climateData.map(item => item._id)
-        }];
-
-        letlayoutScatter1 = {
-          title: 'Precipitation vs. Fires',
-          xaxis:{title: 'Number of Fires'},
-          yaxis:{title: 'Total annual Precipitation'}
-        }
-
-        let traceScatter2 = [{ 
-          x: fireData.map(item => item.count),
-          y: climateData.map(item => item.mean_temp),
-          mode: 'markers', 
-          type: 'scatter',
-          text: climateData.map(item => item._id)
-        }];
-
-        letlayoutScatter2 = {
-          title: 'Temperature vs. Fires',
-          xaxis:{title: 'Number of Fires'},
-          yaxis:{title: 'Mean Temperature'}
-        }
-
-        Plotly.newPlot('scatter', traceScatter1, letlayoutScatter1);
-        Plotly.newPlot('scatter2', traceScatter2, letlayoutScatter2);
-      });
-    });
-  </script>
-
-
-
 
   <script>
     // <!-- I could add more stuff here, I'm not sure yet, would like to discuss with you guys -->
