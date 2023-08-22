@@ -116,7 +116,6 @@ function changeOutput (year){
                     `).addTo(yearlyMap);
                 climateMarkers.push(marker2);
             };
-
         });
 
         // Call the grouped fire data for the info panel

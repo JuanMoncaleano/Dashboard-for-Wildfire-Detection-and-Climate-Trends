@@ -15,6 +15,30 @@ d3.json('http://127.0.0.1:5000/api/v1.0/fires/season/1977/2022').then(function(f
     //     return [linearRegression.m, linearRegression.b]
     //   }
 
+      let scatter1 = ss.sampleCorrelation(fireData.map(item => item.count), climateData.map(item => item.precip));
+      console.log(scatter1);
+
+      let scatter2 = ss.sampleCorrelation(fireData.map(item => item.count), climateData.map(item => item.mean_temp));
+      console.log(scatter2);
+
+      let scatter3 = ss.sampleCorrelation(fireData.map(item => item.total_burn), climateData.map(item => item.precip));
+      console.log(scatter3);
+
+      let scatter4 = ss.sampleCorrelation(fireData.map(item => item.total_burn), climateData.map(item => item.mean_temp));
+      console.log(scatter4);
+
+      let scatter1insert = d3.select("#scatter1").html("");
+      scatter1insert.append("h6").text(`Correlation coefficient: ${scatter1.toFixed(3)}`);
+
+      let scatter2insert = d3.select("#scatter2").html("");
+      scatter2insert.append("h6").text(`Correlation coefficient: ${scatter2.toFixed(3)}`);
+
+      let scatter3insert = d3.select("#scatter3").html("");
+      scatter3insert.append("h6").text(`Correlation coefficient: ${scatter3.toFixed(3)}`);
+
+      let scatter4insert = d3.select("#scatter4").html("");
+      scatter4insert.append("h6").text(`Correlation coefficient: ${scatter4.toFixed(3)}`);
+
       let traceRainVersusFireCount = [{ 
         x: fireData.map(item => item.count),
         y: climateData.map(item => item.precip),

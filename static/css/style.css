@@ -19,6 +19,26 @@ html {
   margin-bottom: 10px; 
 }
 
+#scatter1 {
+  text-align: center; 
+  margin-bottom: 1px; 
+}
+
+#scatter2 {
+  text-align: center; 
+  margin-bottom: 1px; 
+}
+
+#scatter3 {
+  text-align: center; 
+  margin-bottom: 1px; 
+}
+
+#scatter4 {
+  text-align: center; 
+  margin-bottom: 1px; 
+}
+
 /* https://codepen.io/haakseth/pen/KQbjdO */
 .legend {
   padding: 6px 8px;
