@@ -19,20 +19,17 @@ A Jupyter Notebook that provides instructions and code for importing wildfire an
 **Installation and Running**
 Requirements
 
-Python (Version 3.x recommended)
-Flask
-pymongo
-MongoDB (local installation)
-Required Libraries (if any)
-Running the Application
-Follow the instructions in Database_Load.ipynb to import the required data into MongoDB.
-Start the back-end server using:
-Copy code
-python app.py
-Open index.html in a web browser.
+* Python (Version 3.x recommended)
+* Flask
+* pymongo
+* MongoDB (local installation)
+* Running the Application
+* Follow the instructions in Database_Load.ipynb to import the required data into MongoDB.
+* python app.py
+* Open index.html in a web browser.
 
 **Contributing**
 
-Juan Moncaleano
-Sean Allen
-Justin Zhang
+* Juan Moncaleano
+* Sean Allen
+* Justin Zhang
