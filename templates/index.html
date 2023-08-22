@@ -14,7 +14,7 @@
   crossorigin=""/>
 
   <!-- Our CSS -->
-  <link rel="stylesheet" type="text/css" href="./static/css/style.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/style.css">
 
   <!-- Leaflet JavaScript code -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -24,18 +24,22 @@
   <!-- Icons -->
   <script src="static/js/leaflet.extra-markers.min.js"></script>
   <!-- <link rel="stylesheet" type="text/css" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"> -->
-  <link rel="stylesheet" href="./static/css/leaflet.extra-markers.min.css">
+  <link rel="stylesheet" href="../static/css/leaflet.extra-markers.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
   <!-- MomentJS -->
   <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script> -->
   
+  <!-- MiniMap library -->
+  <script src="https://cdn.jsdelivr.net/gh/maneoverland/leaflet.WorldMiniMap@1.0.0/dist/Control.WorldMiniMap.js" integrity="sha512-PFw8St3qenU1/dmwCfiYYN/bRcqY1p3+sBATR+rZ6622eyXOk/8izVtlmm/k8qW7KbRIJsku838WCV5LMs6FCg==" crossorigin=""></script>
+
+
   <!-- D3 library -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
 
   <!-- Our JavaScript file -->
-  <script src="./static/js/visualizations.js"></script>
-  <script src="./static/js/leaflet-providers.js"></script>
+  <script src="../static/js/visualizations.js"></script>
+  <script src="../static/js/leaflet-providers.js"></script>
 </head>
 
 <body>
@@ -67,7 +71,7 @@
 
     <!-- This row will have several viz that change on year -->
     <div class="row">
-      <div class="col-md-2">
+      <div class="col-md-3">
         <div class="well">
           <h5>Year:</h5>
           <select id="selYear" onchange="updateDashboard(this.value)"></select>
@@ -79,7 +83,7 @@
           <div id="year-info" class="panel-body"></div>
         </div>
       </div>
-      <div class="col-md-10">
+      <div class="col-md-9">
         <!-- <div id="map-title">Map Title</div> -->
         <div id="yearly-map" style="height: 450px;"></div>
       </div>
@@ -166,6 +170,7 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19,
     }).addTo(yearlyMap);
+    var worldMiniMap = L.control.worldMiniMap({position: 'bottomright', style: {opacity: 0.9, borderRadius: '0px', backgroundColor: 'lightblue'}}).addTo(yearlyMap);
 
   </script>
 </body>
