@@ -1,5 +1,5 @@
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from pymongo import MongoClient
 from flask_caching import Cache
 
@@ -71,7 +71,7 @@ def grouped_climate_by_season(collection, start, end):
             "$group": {
                 "_id": "$LOCAL_YEAR",
                 "precip": {"$sum": '$TOTAL_PRECIPITATION'},
-                "snow": {"$sum": '$TOTAL_SNOWFALL'},
+                # "snow": {"$sum": '$TOTAL_SNOWFALL'},
                 "mean_temp": {"$avg": "$MEAN_TEMPERATURE"}
             }
         },
@@ -137,12 +137,13 @@ def get_climate_by_specific_month(collection, start, end):
         pipeline = [
         {
             "$match": {
-              "LOCAL_YEAR": {"$gte": start, "$lte": end}
+              "LOCAL_YEAR": {"$gte": start, "$lte": end},
+              "LOCAL_MONTH": {"$gte": 5, "$lte": 9}
             }
         },
         {
             "$group": {
-                "_id": "$LOCAL_MONTH",
+                "_id": "$LOCAL_YEAR",
                 "precip": {"$sum": '$TOTAL_PRECIPITATION'},
                 "snow": {"$sum": '$TOTAL_SNOWFALL'},
                 "mean_temp": {"$avg": "$MEAN_TEMPERATURE"}
@@ -190,7 +191,7 @@ def get_fire_by_specific_month(collection, start, end):
       
 # Define routes with caching
 @cache.cached(timeout=300)
-@app.route("/")
+@app.route("/dev")
 def welcome():
     return (
         f"Available Routes:<br/>"
@@ -244,7 +245,9 @@ def get_fires_by_month(start, end):
 def get_climate_by_month(start, end):
     return get_climate_by_specific_month(weatherStations, start, end)
 
-
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

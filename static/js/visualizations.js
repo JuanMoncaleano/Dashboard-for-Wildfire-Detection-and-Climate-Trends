@@ -6,11 +6,28 @@ let dropdownURL = baseUrl + allFires
 var fireMarkers = [];
 var climateMarkers = [];
 
+// var map = new L.Map('yearlyMap', {worldMiniMapControl: true});
+
 
 var dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 
+// This adjusts the keys to be more digestible for the info panel
 function formatKey (key) {
-    return key
+    if (key == 'count') {
+        return 'Number of fires'
+    } else if (key == 'total_burn') {
+        return 'Total hectares burned'
+    } else if (key == 'mean_temp') {
+        return 'Mean temperature'
+    } else if (key == 'precip') {
+        return 'Total precipitation'
+    } else {
+        return key
+    }
+}
+
+function formatValues (value) {
+    return value.toLocaleString('en-US')
 }
 
 // Custom weather station markers declaration
@@ -33,6 +50,18 @@ function formatSize (fireSize) {
     return fireSize.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 }
 
+function adjustRadius (radius) {
+    if (radius < 10) {
+        return radius * 100
+    } else {
+        return radius
+    }
+}
+
+// function fixInfoPanel (info) {
+
+// }
+
 
 function changeOutput (year){
 
@@ -41,6 +70,7 @@ function changeOutput (year){
     let changeClimateUrl = baseUrl + '/api/v1.0/climate/' + year
     let yearGroupFireUrl = baseUrl + '/api/v1.0/fires/' + year + '/' + year
     let yearGroupClimateUrl = baseUrl + '/api/v1.0/climate/' + year + '/' + year
+    let yearClimateFireSeason = baseUrl + '/api/v1.0/climate/month/' + year + '/' + year
 
     // Call for the fire points data for the year in question
     d3.json(changeFireUrl).then(function(fireYearData) {
@@ -57,7 +87,9 @@ function changeOutput (year){
             var marker = L.circle([fireYearData[fire].Y, fireYearData[fire].X], {
                 fillOpacity: 0.55,
                 fillColor: "red",
-                radius: fireYearData[fire].FIRE_FINAL_SIZE
+                weight: 0.5,
+                color: "red",
+                radius: adjustRadius(fireYearData[fire].FIRE_FINAL_SIZE)
             }).bindPopup(`<h4>${formatDate(fireYearData[fire].FIRE_START_DATE)}</h4>\
                 <hr>\
                 <h5>Fire size: ${formatSize(fireYearData[fire].FIRE_FINAL_SIZE)} ha </h5>`).addTo(yearlyMap);
@@ -78,7 +110,10 @@ function changeOutput (year){
             for (let station in climateYearData) {
                 var marker2 = L.marker([climateYearData[station].lat, climateYearData[station].lon], { 
                     icon: weatherMarker 
-                }).bindPopup(`<h6>${climateYearData[station]._id}</h6> <br /> <h7>${climateYearData[station].precip}`).addTo(yearlyMap);
+                }).bindPopup(`<h4>${climateYearData[station]._id}</h4> <hr>\
+                    <h5>Total precipitation: ${formatSize(climateYearData[station].precip)}</h5>\
+                    <h5>Mean Temperature: ${formatSize(climateYearData[station].mean_temp)}</h5>\
+                    `).addTo(yearlyMap);
                 climateMarkers.push(marker2);
             };
 
@@ -101,7 +136,7 @@ function changeOutput (year){
             for (var i = 0; i < keys.length; i++) {
                 var key = keys[i];
                 if (key != '_id') {
-                    infoPanel.append("h6").text(`${formatKey(key)}: ${info[key]}`);
+                    infoPanel.append("h6").text(`${formatKey(key)}: ${formatValues(info[key])}`);
                 }
             };
 
@@ -114,7 +149,8 @@ function changeOutput (year){
                 for (key in climateKeys) {
                     // console.log(climateInfo)
                     if (climateKeys[key] != '_id') {
-                        infoPanel.append("h6").text(`${formatKey(climateKeys[key])}: ${climateInfo[climateKeys[key]]}`);
+                        infoPanel.append("h6").text(`${formatKey(climateKeys[key])}: \
+                        ${formatValues(climateInfo[climateKeys[key]])}`);
                     }
                 }
             });
