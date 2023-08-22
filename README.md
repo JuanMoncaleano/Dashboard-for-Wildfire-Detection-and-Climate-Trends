@@ -6,6 +6,7 @@ This project consists of a "Wildfire and Climate Data Dashboard" that integrates
 **Files and Structure**
 
 index.html
+
 The main HTML file defines the structure of the web page. It includes Bootstrap for styling, Leaflet for mapping, and custom CSS.
 
 app.py
